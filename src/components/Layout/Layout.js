@@ -1,5 +1,5 @@
 import { Outlet } from "react-router-dom";
-import App from "../App/App";
+import App from "../AppBar/AppBar";
 
 export default function Layout() {
   return (
