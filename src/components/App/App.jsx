@@ -1,43 +1,55 @@
-import { useSelector, useDispatch } from "react-redux";
-import { useEffect, useMemo } from "react";
-import { useDebounce } from "use-debounce";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { refreshUser } from "../../redux/auth/operations";
+import { selectIsRefreshing } from "../../redux/auth/selectors";
 
-import css from "./App.module.css";
-
-import ContactForm from "../ContactForm/ContactForm";
-import ContactList from "../ContactList/ContactList";
-import SearchBox from "../SearchBox/SearchBox";
-
-import { fetchContacts, deleteContact } from "../../redux/contacts/operations";
+import { Route, Routes } from "react-router-dom";
+import Layout from "../Layout/Layout";
+import HomePage from "../../pages/HomePage/HomePage";
+import LoginPage from "../../pages/LoginPage/LoginPage";
+import RegistrationPage from "../../pages/RegistrationPage/RegistrationPage";
+import ContactsPage from "../../pages/ContactsPage/ContactsPage";
+import RestrictedRoute from "../RestrictedRoute/RestrictedRoute";
+import PrivateRoute from "../PrivateRoute/PrivateRoute";
 
 export default function App() {
   const dispatch = useDispatch();
-
-  const contacts = useSelector((state) => state.contacts.items);
-  const filter = useSelector((state) => state.filters.name);
-
-  const [debouncedInputValue] = useDebounce(filter, 200);
+  const isRefreshing = useSelector(selectIsRefreshing);
 
   useEffect(() => {
-    dispatch(fetchContacts());
+    dispatch(refreshUser());
   }, [dispatch]);
 
-  const visibleContacts = useMemo(() => {
-    return contacts.filter((contact) =>
-      contact.name.toLowerCase().includes(debouncedInputValue.toLowerCase())
-    );
-  }, [debouncedInputValue, contacts]);
-
-  const handleDelete = (id) => {
-    dispatch(deleteContact(id));
-  };
+  if (isRefreshing) {
+    return <b>Loading user data...</b>;
+  }
 
   return (
-    <div className={css.container}>
-      <h1>Phonebook</h1>
-      <ContactForm />
-      <SearchBox />
-      <ContactList contactsList={visibleContacts} onDelete={handleDelete} />
-    </div>
+    <Routes>
+      <Route path="/" element={<Layout />}>
+        <Route index element={<HomePage />} />
+        <Route
+          path="register"
+          element={
+            <RestrictedRoute
+              redirectTo="/contacts"
+              component={<RegistrationPage />}
+            />
+          }
+        />
+        <Route
+          path="login"
+          element={
+            <RestrictedRoute redirectTo="/contacts" component={<LoginPage />} />
+          }
+        />
+        <Route
+          path="contacts"
+          element={
+            <PrivateRoute redirectTo="/login" component={<ContactsPage />} />
+          }
+        />
+      </Route>
+    </Routes>
   );
 }
