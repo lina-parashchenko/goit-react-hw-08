@@ -17,6 +17,13 @@
   border-bottom: 1px solid #ddd;
 }
 
+.name {
+  font-size: 25px;
+  font-weight: 500;
+  margin-right: 12px;
+  color: #be1168;
+}
+
 .button {
   padding: 10px;
   background-color: #208ccb;
