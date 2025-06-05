@@ -16,3 +16,17 @@
   padding: 16px;
   border-bottom: 1px solid #ddd;
 }
+
+.button {
+  padding: 10px;
+  background-color: #208ccb;
+  color: white;
+  border: none;
+  font-size: 16px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.button:hover {
+  background-color: #043161;
+}
