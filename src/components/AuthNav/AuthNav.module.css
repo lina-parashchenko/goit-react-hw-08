@@ -1,12 +1,12 @@
 .link {
   margin-right: 12px;
   text-decoration: none;
-  color: #333;
+  color: #1e3295;
   font-weight: bold;
 }
 
 .link.active {
-  color: tomato;
+  color: rgb(117, 255, 71);
 }
 
 .header {
