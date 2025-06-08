@@ -1,17 +1,18 @@
-import css from "./ContactForm.module.css";
-import { Field, Form, Formik, ErrorMessage } from "formik";
 import { useId } from "react";
+import { useDispatch } from "react-redux";
+import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import "yup-phone-lite";
-import { useDispatch } from "react-redux";
+import { TextField, Button, Box } from "@mui/material";
 import { addContact } from "../../redux/contacts/operations";
+import toast from "react-hot-toast";
 
 const initialValues = {
   name: "",
   number: "",
 };
 
-const FeedbackSchema = Yup.object().shape({
+const validationSchema = Yup.object().shape({
   name: Yup.string().min(3, "Short").max(50, "Long").required("Required"),
   number: Yup.string()
     .phone("UA", "Please enter a valid phone number")
@@ -23,42 +24,64 @@ export default function ContactForm() {
   const nameFieldId = useId();
   const numberFieldId = useId();
 
-  const handleSubmit = (values, actions) => {
-    dispatch(addContact(values));
-    actions.resetForm();
+  const handleSubmit = async (values, actions) => {
+    try {
+      await dispatch(addContact(values)).unwrap();
+      toast.success(`Контакт "${values.name}" успішно додано!`);
+      actions.resetForm();
+    } catch (error) {
+      toast.error("Не вдалося додати контакт. Спробуйте ще раз.");
+    }
   };
 
   return (
     <Formik
       initialValues={initialValues}
       onSubmit={handleSubmit}
-      validationSchema={FeedbackSchema}
+      validationSchema={validationSchema}
     >
-      <Form className={css.formWrap}>
-        <div className={css.formFieldWrap}>
-          <label htmlFor={nameFieldId}>Name</label>
-          <Field
-            type="text"
-            name="name"
-            id={nameFieldId}
-            className={css.fieldwrap}
-          />
-          <ErrorMessage name="name" component="span" className={css.error} />
+      {({ values, handleChange, handleBlur, touched, errors }) => (
+        <Form>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              gap: 2,
+              maxWidth: 400,
+              margin: "0 auto",
+              padding: 2,
+            }}
+          >
+            <TextField
+              id={nameFieldId}
+              label="Name"
+              name="name"
+              value={values.name}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              error={touched.name && Boolean(errors.name)}
+              helperText={touched.name && errors.name}
+              fullWidth
+            />
 
-          <label htmlFor={numberFieldId}>Number</label>
-          <Field
-            type="text"
-            name="number"
-            id={numberFieldId}
-            className={css.fieldwrap}
-          />
-          <ErrorMessage name="number" component="span" className={css.error} />
-        </div>
+            <TextField
+              id={numberFieldId}
+              label="Phone Number"
+              name="number"
+              value={values.number}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              error={touched.number && Boolean(errors.number)}
+              helperText={touched.number && errors.number}
+              fullWidth
+            />
 
-        <button type="submit" className={css.btn}>
-          Add contact
-        </button>
-      </Form>
+            <Button type="submit" variant="contained" color="primary">
+              Add Contact
+            </Button>
+          </Box>
+        </Form>
+      )}
     </Formik>
   );
 }

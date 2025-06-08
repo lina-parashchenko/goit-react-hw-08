@@ -1,13 +1,14 @@
 import { useDispatch } from "react-redux";
-import { Formik, Form, Field, ErrorMessage } from "formik";
+import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import { login } from "../../redux/auth/operations";
-
-import css from "./LoginForm.module.css";
+import { TextField, Button, Box } from "@mui/material";
 
 const validationSchema = Yup.object().shape({
   email: Yup.string().email("Invalid email").required("Email is required"),
-  password: Yup.string().min(6).required("Password is required"),
+  password: Yup.string()
+    .min(6, "Password must be at least 6 characters")
+    .required("Password is required"),
 });
 
 export default function LoginForm() {
@@ -24,21 +25,48 @@ export default function LoginForm() {
       validationSchema={validationSchema}
       onSubmit={handleSubmit}
     >
-      <Form autoComplete="off" className={css.form}>
-        <label className={css.label}>
-          Email
-          <Field type="email" name="email" className={css.input} />
-          <ErrorMessage name="email" component="div" className={css.error} />
-        </label>
-        <label className={css.label}>
-          Password
-          <Field type="password" name="password" className={css.input} />
-          <ErrorMessage name="password" component="div" className={css.error} />
-        </label>
-        <button type="submit" className={css.button}>
-          Login
-        </button>
-      </Form>
+      {({ touched, errors, handleChange, handleBlur, values }) => (
+        <Form autoComplete="off">
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              gap: 2,
+              maxWidth: 400,
+              margin: "0 auto",
+              padding: 2,
+            }}
+          >
+            <TextField
+              label="Email"
+              name="email"
+              type="email"
+              value={values.email}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              error={touched.email && Boolean(errors.email)}
+              helperText={touched.email && errors.email}
+              fullWidth
+            />
+
+            <TextField
+              label="Password"
+              name="password"
+              type="password"
+              value={values.password}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              error={touched.password && Boolean(errors.password)}
+              helperText={touched.password && errors.password}
+              fullWidth
+            />
+
+            <Button type="submit" variant="contained" color="primary">
+              Login
+            </Button>
+          </Box>
+        </Form>
+      )}
     </Formik>
   );
 }

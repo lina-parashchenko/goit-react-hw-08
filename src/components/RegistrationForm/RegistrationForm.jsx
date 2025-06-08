@@ -2,8 +2,7 @@ import { useDispatch } from "react-redux";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { register } from "../../redux/auth/operations";
-
-import css from "./RegistrationForm.module.css";
+import { TextField, Button, Box } from "@mui/material";
 
 const validationSchema = Yup.object().shape({
   name: Yup.string().required("Name is required"),
@@ -25,26 +24,57 @@ export default function RegistrationForm() {
       validationSchema={validationSchema}
       onSubmit={handleSubmit}
     >
-      <Form autoComplete="off" className={css.form}>
-        <label className={css.label}>
-          Name
-          <Field type="text" name="name" className={css.input} />
-          <ErrorMessage name="name" component="div" className={css.error} />
-        </label>
-        <label className={css.label}>
-          Email
-          <Field type="email" name="email" className={css.input} />
-          <ErrorMessage name="email" component="div" className={css.error} />
-        </label>
-        <label className={css.label}>
-          Password
-          <Field type="password" name="password" className={css.input} />
-          <ErrorMessage name="password" component="div" className={css.error} />
-        </label>
-        <button type="submit" className={css.button}>
-          Register
-        </button>
-      </Form>
+      {({ touched, errors, handleChange, handleBlur, values }) => (
+        <Form autoComplete="off">
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              gap: 6,
+              maxWidth: 400,
+              margin: "0 auto",
+            }}
+          >
+            <TextField
+              label="Name"
+              name="name"
+              value={values.name}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              error={touched.name && Boolean(errors.name)}
+              helperText={touched.name && errors.name}
+              fullWidth
+            />
+
+            <TextField
+              label="Email"
+              name="email"
+              value={values.email}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              error={touched.email && Boolean(errors.email)}
+              helperText={touched.email && errors.email}
+              fullWidth
+            />
+
+            <TextField
+              label="Password"
+              name="password"
+              type="password"
+              value={values.password}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              error={touched.password && Boolean(errors.password)}
+              helperText={touched.password && errors.password}
+              fullWidth
+            />
+
+            <Button variant="contained" type="submit">
+              Register
+            </Button>
+          </Box>
+        </Form>
+      )}
     </Formik>
   );
 }
